@@ -2,6 +2,8 @@
 
 **Community-maintained file-format specification for OmniPlan `.oplx` documents.**
 
+> **Naming note**: `oplx` is the file extension OmniPlan uses (`.oplx`). This project is **not** related to Yamaha OPL audio synthesis chips (OPL2/OPL3/OPL4) which share a similar string in some retro-audio communities.
+
 OmniPlan is The Omni Group's project planning app. Its `.oplx` document format is a directory bundle (or alternatively a flat zip) containing XML files that describe scenarios, tasks, resources, schedules, and dependencies. Omni publishes excellent docs for [Omni Automation](https://omni-automation.com/omniplan/) (the omniJS scripting layer) and the AppleScript dictionary, but **does not publish a specification of the file format itself**. This repo fills that gap.
 
 ## Status
