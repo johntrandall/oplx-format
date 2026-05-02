@@ -1,0 +1,6 @@
+spec-version: 0.1.0
+verified-against:
+  omniplan: 4.10.2
+  date: 2026-05-02
+  platform: macOS 24 (Sequoia)
+file-format-version: 3
