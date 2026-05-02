@@ -64,7 +64,7 @@ The `.oplx` extension covers both — OmniPlan introspects the contents, not the
 
 - [`examples/minimum-viable.oplx`](examples/minimum-viable.oplx) — smallest valid `.oplx` (1.1 KB zip, 3 hand-coded XML files)
 - [`examples/with-baseline.oplx`](examples/with-baseline.oplx) — multi-scenario doc with one baseline
-- [`examples/with-dependencies.oplx`](examples/with-dependencies.oplx) — all 4 dependency kinds + lead-time forms
+- [`examples/with-hammock.oplx`](examples/with-hammock.oplx) — hammock task pattern (the only way to create one — the omniJS API silently refuses)
 
 ## Tooling
 
