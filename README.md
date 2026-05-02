@@ -22,6 +22,19 @@ You will find this useful if you:
 - Are writing tools that interoperate with OmniPlan
 - Want to understand silent-corruption modes that may bite hand-edited or generated files
 
+## Ecosystem
+
+This spec has a Python reference implementation and a sibling MCP server:
+
+| Repo | What it is | When to use |
+|---|---|---|
+| 📖 [**oplx-format**](https://github.com/johntrandall/oplx-format) (this repo) | The file-format **specification** (CC-BY-4.0) | Read this if you're writing any `.oplx` tool in any language |
+| 🐍 [**oplx-tools**](https://github.com/johntrandall/oplx-tools) | **Python**: generate / lint / parse — **no OmniPlan needed** | Headless `.oplx` workflows: CI/CD, batch generation, agent file-write |
+| 🤖 [**omniplan-mcp**](https://github.com/johntrandall/omniplan-mcp) | **MCP server** for live OmniPlan automation (requires OmniPlan running) | Conversational task management with Claude — "schedule a task tomorrow at 2pm" |
+| 📦 [**lash**](https://github.com/johntrandall/lash) | The installer used to wire `oplx-tools`'s lint hook into Claude Code | One-shot setup for the agent integration |
+
+The MCP and `oplx-tools` are complementary, not competitive: MCP for live runtime queries; `oplx-tools` for headless file mutation. Both implement this spec.
+
 ## Quick orientation
 
 An `.oplx` document has two equivalent forms:
