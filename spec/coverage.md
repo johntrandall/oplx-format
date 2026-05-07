@@ -114,7 +114,10 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 - [ ] AppleScript `lead percentage` boundaries (does it match omniJS integer or stay fraction with truncation?)
 
 ### Future-version surveillance
-- [ ] Verify spec against OmniPlan 4.11+ when released
+- [ ] **TODO when next OmniPlan release ships** — Verify Task `parent` accessor + `move` method against the live release. Vendor confirms fix in next release per RT #3107771 (2026-05-05); update to Verified once release ships and tested.
+- [ ] **TODO when next OmniPlan release ships** — Verify Resource `parent` accessor + `move` method against the live release. Vendor confirms fix in next release per RT #3107771; update to Verified once release ships and tested.
+- [ ] **TODO when next OmniPlan release ships** — Reconfirm `Decimal.fromString("100.00").toString()` is the canonical round-trip pattern across all Decimal-typed properties (`staticCost`, `costPerHour`, `costPerUse`) against the live release. Vendor confirms this is by-design per RT #3107771; update to Verified once release ships and tested.
+- [ ] Verify broader spec against OmniPlan 4.11+ when released.
 - [ ] OmniPlan 5.x format-version changes (currently `file-format-version="3"`)
 
 ## Methodology lessons

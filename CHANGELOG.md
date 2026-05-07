@@ -2,6 +2,12 @@
 
 All notable changes to this spec are documented here. See `VERSION` for the current spec version and the OmniPlan version it was verified against.
 
+## [Unreleased]
+
+### 2026-05-07
+
+- `LICENSE` replaced with the canonical SPDX CC-BY-4.0 text so GitHub's Licensee detector recognizes the license correctly. Trademark / scope / methodology content from the previous LICENSE file migrated to a new sibling `NOTICE.md`. README License section updated accordingly.
+
 ## [0.1.0] — 2026-05-02
 
 Initial public release. Verified against OmniPlan 4.10.2 on macOS 24 (Sequoia).

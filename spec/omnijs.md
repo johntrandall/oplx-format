@@ -76,6 +76,15 @@ When all three are set, `effort` is auto-computed via PERT: `effort = (min + 4*e
 - `prerequisites` (Array of Dependency r/o — settable via `addPrerequisite`)
 - `dependents` (Array of Dependency)
 
+> **TODO when next OmniPlan release ships** (RT #3107771, 2026-05-05):
+> Omni Group support confirmed Task (and Resource) will gain a `parent`
+> accessor and a `move` method that reparents without churning
+> `uniqueID`. Test builds available now at
+> <https://omnistaging.omnigroup.com/omniplan/>. Update this section to
+> Verified once the formal release ships and the live surface is tested.
+> Until then the 4.10.2-Verified gap statement (no reparent path on the
+> hierarchy described above) stands.
+
 ### Costs
 
 - `staticCost` (Decimal — settable)
@@ -134,6 +143,15 @@ Methods:
 - `setCustomData(...)`, `customValue(...)`, `setCustomValue(...)`
 - `descendents() → Array of Resource`
 - `remove()`
+
+> **TODO when next OmniPlan release ships** (RT #3107771, 2026-05-05):
+> Omni Group support confirmed Resource (alongside Task) will gain a
+> `parent` accessor and a `move` method addressing the same
+> reparent-without-`uniqueID`-churn gap on the resource tree. Test
+> builds at <https://omnistaging.omnigroup.com/omniplan/>. Update this
+> section to Verified once the formal release ships and the live
+> surface is tested. The 4.10.2 documentation above remains accurate
+> for that version.
 
 ## Scenario (`actual`) properties
 
@@ -220,6 +238,17 @@ Cannot be constructed via `Duration.fromString(...)` — that method only exists
 `Decimal.fromString(string)` is the canonical constructor for Decimal values.
 
 Used for `staticCost`, `costPerHour`, `costPerUse`, etc. **Do NOT pass Decimal where Number is expected** (e.g., `dep.leadTimePercentage` rejects Decimal).
+
+> **TODO when next OmniPlan release ships** (RT #3107771, 2026-05-05):
+> Omni Group support confirmed `Decimal.fromString("100.00").toString()`
+> is the canonical round-trip pattern, and that the absence of a direct
+> `Decimal → Number` coercion is by design (Decimal wraps
+> `NSDecimalNumber`; binary floating-point can't represent every decimal
+> value precisely, so a silent coercion would lose precision). Update
+> this section to document the canonical pattern as Verified once the
+> next release ships and the live behavior is reconfirmed. The 4.10.2
+> regex-based `toString` workaround above continues to work in the
+> interim.
 
 ## URL invocation pattern
 

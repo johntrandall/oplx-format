@@ -11,6 +11,7 @@ OmniPlan is The Omni Group's project planning app. Its `.oplx` document format i
 - **Verified against**: OmniPlan 4.10.2 (macOS, build 2026-05-01)
 - **Format version**: `file-format-version="3"` (per `__TOC.xml`)
 - **Coverage**: substantially complete for core entities (tasks, resources, dependencies, assignments, schedules, baselines). Some edge cases still tagged Observed-not-Verified — see `spec/coverage.md`.
+- **Pre-release builds (2026-05-06)**: Omni Group test builds at <https://omnistaging.omnigroup.com/omniplan/> expand the omniJS surface — `parent` accessor and `move` method on both Task and Resource (per Omni Group RT #3107771). Verified-against remains 4.10.2; pre-release additions are documented in `spec/omnijs.md` and tracked in `spec/coverage.md` as Inferred until the test builds are run end-to-end.
 - **Maintainership**: best-effort, single-version snapshot. Not affiliated with The Omni Group.
 
 ## Audience
@@ -82,7 +83,7 @@ A separate companion repo, `oplx-tools`, provides Python-based reference impleme
 
 ## License
 
-CC-BY-4.0 (text, examples). The Omni Group's documentation references are quoted under fair use; the format itself is described from observable behavior and is not subject to copyright.
+Specification text is licensed CC-BY-4.0 (see [LICENSE](LICENSE)). See [NOTICE.md](NOTICE.md) for trademark and scope notes — OmniPlan is a trademark of The Omni Group; this spec is empirical and not affiliated with or endorsed by Omni.
 
 ## Contributing
 
