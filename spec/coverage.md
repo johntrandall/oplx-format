@@ -115,7 +115,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 - [ ] `Project.title` setter — where does it persist?
 
 ### Edge cases
-- [ ] Hammock without deps — what effort does OmniPlan compute?
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — Hammock without deps: OmniPlan computes effort = **1 work week** = `hours-per-week` × 3600s = 144000s for the default `hours-per-week="40"`. Test: converted a normal task (original effort 7200) to `<type>hammock</type>` with no `<prerequisite-task>` elements, opened in OmniPlan, saved; post-save `<effort>` was 144000. Task is accepted (no rejection), `<recalculate>duration</recalculate>` is preserved. The original task's effort value is overwritten by the recalculation.
 - [ ] Hammock with multiple prereqs — which one defines the start?
 - [x] **VERIFIED 2026-05-27** — `<numbering-style>` accepts `wbs` (Hierarchical Numbering) AND `flat` (Flat Numbering). Test: injected `<numbering-style>flat</numbering-style>` in a hand-built `.oplx` TOC, opened in OmniPlan 4.10.2, View → Task Outline submenu shows "Flat Numbering" checked, "Hierarchical Numbering" unchecked. (Reverse case: `wbs` → Hierarchical checked.) The "Show/Hide Numbering" toggle is independent — separate XML element not yet identified. The AppleScript dictionary exposes no `numbering style` enum (the XML element is wire-only). Whether other enum values exist (e.g. for the show/hide toggle) — Open.
 - [ ] `<page-adornment>` complete variable list (only `OPDocumentTitleVariableIdentifier`, `OPPrintJobTimestampVariableIdentifier` seen)

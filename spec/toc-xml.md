@@ -176,6 +176,14 @@ Records UI state as of last save: which view is active, column widths, gantt zoo
 
 The `<scale scale-name="..." full-day-width="N">` entries set the gantt zoom levels (Automatic, Day, Hour, Minute, Month, Quarter, Week, Year). One has `<selected/>` indicating the active zoom.
 
+### `<column>` entries inside `<outline>`
+
+Each column in the outline displays as `<column name="X" width="N"/>`. The `name` attribute uses the human-readable column name with capitalized casings (Verified 2026-05-27 across `funding-pipeline.oplx`, `Gantt Timeline BAK 11.11.oplx`, and a spacessync-launch.oplx-derived fixture). Known built-in names: `Violations`, `Notes`, `Title`, `Effort`, `Start`, `End`, `Prerequisites`, `Assigned`, `Type`, `Resource`, `Status`, `%Done`. Non-exhaustive — OmniPlan exposes more via View → Columns.
+
+**Pro custom-data fields surface as `<column name="<KeyName>" .../>` entries** matching their custom-data key verbatim. Verified 2026-05-27 (VM `oplx-spec-verify`): `t.setCustomValue("BudgetCode","BC-9999")` via omniJS emitted `<column name="BudgetCode" width="94"/>` and `<column name="Department" width="89"/>` in the saved `__TOC.xml`, plus matching keys registered in `<task-user-data-keys>`.
+
+Wrong attribute (`key=` instead of `name=`, or lowercase column names) causes file-level rejection with silent `-10000`. See `silent-corruption.md`.
+
 ### `<gantt-view>` toggle children — View → Gantt menu state
 
 The `<gantt-view>` element holds the Gantt-area UI configuration. Five empty-element children represent the state of toggleable items in **View → Gantt** menu. When the toggle is ON, the element is present; when OFF, the element is absent. **Menu item is `enabled=true` in BOTH cases** — the element controls the CHECKED state of the toggle, not the ENABLED state. (Verified 2026-05-27 via single-variable AppleScript probe against OmniPlan 4.10.2.)
