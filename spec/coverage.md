@@ -105,15 +105,18 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 ### Edge cases
 - [ ] Hammock without deps — what effort does OmniPlan compute?
 - [ ] Hammock with multiple prereqs — which one defines the start?
-- [ ] Other `<numbering-style>` enum values besides `wbs`
+- [ ] Other `<numbering-style>` enum values besides `wbs`. UI evidence (reference manual `gantt-view.md`, `menu-commands-and-keyboard-shortcuts.md`) shows three user-facing states: **Show/Hide Numbering** toggle, **Flat Numbering** (1, 2, 3, …), **Hierarchical Numbering** (1, 1.1, 1.1.1, …). The Verified `wbs` value corresponds to Hierarchical; a sibling value for Flat is implied but its literal XML token is untested. The AppleScript dictionary exposes no `numbering style` enum (the element is XML-only). Hypothesis to test: `<numbering-style>flat</numbering-style>` and/or a separate `<show-numbering>` boolean.
 - [ ] `<page-adornment>` complete variable list (only `OPDocumentTitleVariableIdentifier`, `OPPrintJobTimestampVariableIdentifier` seen)
 - [ ] Note rich-text with formatting (bold/italic/color/alignment) — `<style>` block grammar
-- [ ] `<user-data>` value types beyond `<string>` — does `<number>` / `<date>` work?
+- [ ] `<user-data>` value types beyond `<string>` — does `<number>` / `<date>` work? AppleScript surface declares `custom data` and the `value` field of `<custom data entry>` (`class OPKeyValuePair`) as type `any`, suggesting non-string values are supported at the model layer. Wire form not yet observed for non-`<string>` children; needs an isolated write/save round-trip to verify.
 - [ ] `<custom-data>` cold-write (key not in `__TOC.xml/<task-user-data-keys>`)
 - [ ] `subtract work time on date "..."` — find the working date format
 - [ ] AppleScript `lead percentage` boundaries (does it match omniJS integer or stay fraction with truncation?)
 
 ### Future-version surveillance
+
+> Status check **2026-05-27**: public OmniPlan release is still **4.10.2** (`defaults read /Applications/OmniPlan.app/Contents/Info CFBundleShortVersionString`). All four items below remain pending; re-check when 4.10.3 / 4.11 ships and the RT #3107771 fixes land in a public build.
+
 - [ ] **TODO when next OmniPlan release ships** — Verify Task `parent` accessor + `move` method against the live release. Vendor confirms fix in next release per RT #3107771 (2026-05-05); update to Verified once release ships and tested.
 - [ ] **TODO when next OmniPlan release ships** — Verify Resource `parent` accessor + `move` method against the live release. Vendor confirms fix in next release per RT #3107771; update to Verified once release ships and tested.
 - [ ] **TODO when next OmniPlan release ships** — Reconfirm `Decimal.fromString("100.00").toString()` is the canonical round-trip pattern across all Decimal-typed properties (`staticCost`, `costPerHour`, `costPerUse`) against the live release. Vendor confirms this is by-design per RT #3107771; update to Verified once release ships and tested.
