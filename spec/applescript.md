@@ -38,6 +38,8 @@ The full sdef dump is included in companion repos as a reference. Below is a wor
 | `export ... as "MSPDI"` | Errors `"could not be exported"` regardless of file extension | Use `as "MPP"` for MS Project interop (produces a real `.mpp` binary). |
 | `export ... as "HTML Task List"` (and other HTML variants) | Triggers a "(null) template" dialog; selecting any option **CRASHES OmniPlan** | Avoid until the broken `OPHTMLTemplate*` preference is cleared. Use CSV export. |
 | `fix violation with action "..."` | Untested in our cycles. | (open) |
+| `set task type of <task> to hammock task` | **Errors `-10000` "AppleEvent handler failed"** despite `task type` being declared writable in `.sdef` (no `access="r"`). The `.sdef`-declared writability is documented-but-broken for the `hammock task` value. Verified 2026-05-27 by repeated direct probe against OmniPlan 4.10.2. | Hand-edit XML: emit `<type>hammock</type>` directly in `Actual.xml` (the only working programmatic path). |
+| `make new task ... with properties {task type: hammock task}` | **Silently ignored** — call succeeds with no error, but resulting task has `task type` of `standard task`. Same documented-but-broken pattern as the post-creation setter above. Verified 2026-05-27. | Hand-edit XML as above. |
 
 ## Working classes
 
