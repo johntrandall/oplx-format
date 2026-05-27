@@ -89,9 +89,9 @@ Only `duration | effort | units` are valid. Anything else silently normalizes to
 
 Setting `task.manualEndDate = D` does NOT produce `<locked-end-date>` (no such element exists). Instead, OmniPlan back-computes a `<locked-start-date>` value of `D - duration`. If the duration changes later, the locked-start-date does NOT update — the task may now end at a different date than the original `manualEndDate`.
 
-### `<next-task-id>` recomputed to max-used+1
+### `<next-task-id>` is preserved verbatim, NOT recomputed (correcting prior claim)
 
-Hand-bumping `<next-task-id>` to a high value does NOT survive — OmniPlan recomputes it on every save. Generators must work with the actual current max ID.
+The prior claim that OmniPlan recomputes `<next-task-id>` to `max(used-id) + 1` on every save was WRONG. Verified 2026-05-27 (VM cross-check): hand-bumping `<next-task-id>` to ANY value — even nonsensically low (e.g. `2` when `t99` exists) — survives the save verbatim. The counter is treated as a hint to OmniPlan, not a derived value. Generators should still set it to `max(used-id) + 1` for forward correctness, but OmniPlan does NOT enforce that constraint and WILL produce collisions if a future task is created against a too-low counter (e.g. creating a new task with `<next-task-id>2</next-task-id>` and `t99` in use produced `t2`, creating coexisting `t1`/`t2`/`t10`/`t99`).
 
 ### `scheduling granularity` value lives in `Actual.xml`
 
@@ -185,7 +185,7 @@ A naive parser reading `<note>/<text>/<p>/<run>/<lit>` text and concatenating wi
 
 6. **Convert lead-time percentage to fraction** when writing XML directly (e.g., `0.25` for 25%). For the omniJS API, use integer percent (`25`).
 
-7. **Don't rely on `<next-task-id>`** for cross-save ID coordination — OmniPlan recomputes it. If you need stable external IDs, use `<user-data>` keys.
+7. **Don't rely on `<next-task-id>`** for cross-save ID coordination — though OmniPlan preserves it verbatim (Verified 2026-05-27), it does NOT enforce `next-task-id > max(used-id)` and will happily create collisions if the counter is too low. If you need stable external IDs, use `<user-data>` keys instead.
 
 ## Recommendations for parsers
 

@@ -67,7 +67,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 - [x] Hand-edit baseline scenario file (separate `<scenario>` XML + reference) is recognized
 
 ### Internal
-- [x] `<next-task-id>` is recomputed to max-used+1 on every save
+- [ ] ~~`<next-task-id>` is recomputed to max-used+1 on every save~~ — **RETRACTED 2026-05-27 (VM cross-check)**. The prior claim was wrong. See Verified entry under "Internal" below for actual behavior.
 - [x] `__changelog.xml` minimum form: `<version>4.0</version>` only
 - [x] `__changelog.xml` `<change-set>` and nested `<change>` grammar
 - [x] OmniPlan strips empty/default-shaped prototype-tasks on save
@@ -87,7 +87,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 ## Observed (correlation, not isolated proof)
 
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — `<recalculate>` invalid values all normalize to `duration` (no file-level rejection). Tested 5 variants in one fixture: `none`, `assignments`, `BOGUS_VALUE`, `DURATION` (uppercase), empty `<recalculate></recalculate>` — all five became `<recalculate>duration</recalculate>` on save. File opened cleanly (count=1). Whether "normalized" vs "stripped + default-fill" is still indistinguishable from output alone — but the practical effect is identical: invalid input → `duration` output, no error.
-- [ ] `next-task-id` reset behavior on every save (Cycle 0011 had it preserved by coincidence in Cycle 0010)
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — `<next-task-id>` is **preserved verbatim from input**, NOT recomputed on every save (correcting prior wrong claim). Test 1: built a fixture with `<next-task-id>2</next-task-id>` and tasks `t1`/`t10`/`t99` (max-used = 99). Save with no edits → output `<next-task-id>2</next-task-id>` unchanged. Test 2: same fixture, opened, added one task via AppleScript `make new task` → new task got id `t2` (the value OmniPlan read from the counter, NOT max-used+1) and the counter advanced to `3`. **Generators should set this to `max(used-id) + 1` to avoid future collisions** but OmniPlan does not enforce that — it trusts the value verbatim and will produce `t2` even when `t99` already exists. Same pattern observed across 4 saved fixtures this session (recalc-test, hammock-multi, dates3, nextid). The 2019-era Cycle 0011 note "preserved by coincidence" was misreading; preservation is the normal behavior, not coincidence.
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — OmniPlan auto-corrects `<resource id="r-1"><name/></resource>` → `<name>Project</name>` AND `<type>Group</type>` → `<type>Project</type>`. Observed in the hammock-multi-test fixture: input had `<resource id="r-1"><name/><type>Group</type>...</resource>`; post-save XML showed `<name>Project</name><type>Project</type>`. The root resource has its own dedicated `Project` type value (not in the Staff/Equipment/Material/Group enum used by user-created resources).
 - [ ] Cycle 0011's `resourceAssignmentType = adjustDuration` round-trip is inferred from t506's saved state (no changelog entry because default values produce no entry)
 

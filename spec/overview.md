@@ -77,7 +77,7 @@ When emitted, the conventional set is 3 prototype-tasks (Task, Milestone, Group)
 | Special resources | `r-<N>` (negative) | `r-1` (root resource), `r-2/r-3` (prototype resources) |
 | Scenario | Opaque (base64-style or freeform) | `lPF-Nw4DT1i` (UI-created); `BLN-2026-05-01` (hand-edit OK) |
 
-`__TOC.xml` tracks `<next-task-id>` and `<next-resource-id>` counters. **OmniPlan recomputes these on every save** to `max(used-id) + 1` — hand-bumped values do NOT survive (Cycle 0011 in the research repo).
+`__TOC.xml` tracks `<next-task-id>` and `<next-resource-id>` counters. OmniPlan **preserves these verbatim from input** (Verified 2026-05-27 — correcting prior claim that they were recomputed). When OmniPlan adds a new task internally, it uses the value as-is and increments afterward. The counter is NOT validated against `max(used-id)`: a doc with `<next-task-id>2</next-task-id>` and existing tasks `t10`/`t99` will create the next task as `t2`, producing coexisting IDs. Generators should set the counter to `max(used-id) + 1` for forward correctness; OmniPlan does not enforce that itself.
 
 ## Reading order
 

@@ -82,7 +82,7 @@ That's it. OmniPlan opens this and fills in everything else (`<window>`, styling
 
 ### `<next-task-id>`, `<next-resource-id>`
 
-ID counters. **OmniPlan recomputes these to `max(used-id) + 1` on every save** — hand-bumped values are NOT preserved. Generators producing fresh docs can set them to any plausible starting value (e.g., `2` for an empty doc).
+ID counters. OmniPlan **preserves these verbatim from input** (Verified 2026-05-27 — correcting prior claim that they were recomputed to `max(used-id) + 1` on save). Hand-bumped values DO survive: a doc opened with `<next-task-id>2</next-task-id>` and existing tasks `t1`/`t10`/`t99` saves with the counter still at `2`. When the counter is too low and OmniPlan later creates a new task internally, it uses the counter value as-is (producing `t2` in this case, coexisting with `t99`) — there is no validation against existing IDs. Generators producing fresh docs should set the counter to `max(used-id) + 1` for forward correctness; OmniPlan does not do this for you.
 
 ### `<scenario>` references
 
