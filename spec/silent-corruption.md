@@ -117,6 +117,10 @@ OmniPlan 4.10.2 accepts ONLY `<string>` as the value type for `<user-data>` keys
 
 Hand-writing `<user-data>` inside the `<task id="t-1">` element (the implicit root) causes OmniPlan to reject the file with silent `-10000` at open. `<user-data>` is only valid on non-root tasks. Verified 2026-05-27.
 
+### Hand-guessed styled-note `<style>` grammar is silently flattened
+
+Hand-writing `<run><style><attribute name="font-traits"><value key="bold">1</value></attribute></style><lit>TEXT</lit></run>` (and other guessed `attribute name=...` variants) does NOT produce bold/italic in the saved note. OmniPlan parses the doc cleanly, then on first save **collapses all separately-styled `<run>` siblings into a single plain `<run>`** with the lit-text concatenated and the bold/italic attributes silently dropped. No errors, no warnings, no leftover indication of the failure. Verified 2026-05-27 with a 5-run injection containing alternating bold/italic/plain runs: post-save was one `<run>` with one `<lit>plain BOLD normal ITALIC end</lit>`. The real `<style>` block grammar for font traits is still Open — needs GUI-driven content as a reference. Methodology lesson: when guessing wire-format grammar from .sdef field names or external conventions, ALWAYS check that the post-save XML preserves the structure you wrote — OmniPlan accepts then collapses without complaint.
+
 ## LOW: cosmetic / metadata
 
 ### Custom-data key order is non-deterministic
