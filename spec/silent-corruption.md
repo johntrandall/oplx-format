@@ -101,6 +101,22 @@ Cycle 0015 of the research repo wrongly claimed the AppleScript `set scheduling 
 
 Hand-writing `<critical-paths/>` (plural) instead of `<critical-path/>` (singular) inside `<gantt-view>` does NOT activate the View → Gantt → Critical Paths toggle. The wrong-name element is silently dropped by OmniPlan on first save with no warning. Same pattern for any naively-guessed sibling toggle name — the menu-name-to-element-name mapping is irregular (see `toc-xml.md` § "`<gantt-view>` toggle children" for the verified 5-element table). Methodology lesson: don't extrapolate element names from menu names; verify each via menu-toggle → save → diff. Verified 2026-05-27 by injecting `<critical-paths/>` into a fixture; OmniPlan stripped it on save and emitted `<critical-path/>` only after the menu was actually toggled.
 
+### `<user-data>` with non-`<string>` value tags rejects the entire file
+
+OmniPlan 4.10.2 accepts ONLY `<string>` as the value type for `<user-data>` keys. Injecting `<number>`, `<date>`, or `<boolean>` causes OmniPlan to silently reject the entire file at open time — `count documents` returns 0, no error dialog, the only signal is the AppleScript `-10000` error if you `tell application "OmniPlan" to open POSIX file`. Verified 2026-05-27 by individually injecting each type into `<user-data>` at the canonical end-of-task position with correct TOC key registration; all three non-string variants reproduced the rejection.
+
+### `<user-data>` placed before `<note>` in a task is silently stripped on save
+
+`<user-data>` must come AT THE END of a task element (after `<note>`, after `<assignment>`, etc.). Injecting it earlier — even just before `<note>` — causes OmniPlan to silently drop the entire block on save. The file opens cleanly; the user-data values are simply missing in the post-save XML. Verified 2026-05-27.
+
+### `<user-data>` without TOC key registration is silently stripped on save
+
+`<user-data>` keys in a task must be registered in `__TOC.xml/<project>/<task-user-data-keys>` for the values to survive a save. Without registration, OmniPlan silently strips the block on save even when position is correct and value type is `<string>`. The spec's `actual-xml.md` previously documented this as "to be visible in OmniPlan's UI" — empirically, the keys aren't merely hidden; they're DELETED from the saved doc. Verified 2026-05-27.
+
+### `<user-data>` on the root task `t-1` causes file-level rejection
+
+Hand-writing `<user-data>` inside the `<task id="t-1">` element (the implicit root) causes OmniPlan to reject the file with silent `-10000` at open. `<user-data>` is only valid on non-root tasks. Verified 2026-05-27.
+
 ## LOW: cosmetic / metadata
 
 ### Custom-data key order is non-deterministic

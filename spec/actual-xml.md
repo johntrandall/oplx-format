@@ -135,9 +135,9 @@ Each line → `<p>` containing `<run>` containing `<lit>`. Styled runs add `<sty
 </user-data>
 ```
 
-Interleaved `<key>NAME</key>` followed by `<string>VALUE</string>` (or `<number>`, `<date>`, etc. — types beyond string not yet Verified). Order is not predictable across saves; do not rely on alphabetical or insertion-order.
+Interleaved `<key>NAME</key>` followed by `<string>VALUE</string>`. **Verified 2026-05-27:** only `<string>` survives as a value type in OmniPlan 4.10.2; injecting `<number>`, `<date>`, or `<boolean>` causes file-level rejection at open time (silent `-10000`). The AppleScript `custom data` surface declares value as `type="any"` and the internal model supports more, but only `<string>` persists through the wire format in 4.10.2. Order is not predictable across saves; do not rely on alphabetical or insertion-order.
 
-The keys in the doc must also be registered in `__TOC.xml/<project>/<task-user-data-keys>` to be visible in OmniPlan's UI.
+The keys in the doc must also be registered in `__TOC.xml/<project>/<task-user-data-keys>` as `<key>NAME</key><null/>` pairs. **This is not optional** (Verified 2026-05-27): without TOC registration, OmniPlan silently strips the `<user-data>` block on save. Position also matters — the block must come AT THE END of the task element (after `<note>`, `<assignment>`, etc.); injected earlier in the task it is silently stripped on save. `<user-data>` is not valid on the root task `t-1` — placing it there causes file-level rejection.
 
 ## `<resource>` element
 
