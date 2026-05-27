@@ -81,6 +81,23 @@ A separate companion repo, `oplx-tools`, provides Python-based reference impleme
 - The format is stable across patch versions of OmniPlan 4.10.x in our testing, but a major-version bump (4.11+, 5.x) could invalidate parts.
 - Some elements documented here have **silent-corruption modes** — patterns that OmniPlan accepts then mis-interprets. Hand-editing without a linter is risky. See `spec/silent-corruption.md`.
 
+## Verification environment
+
+Findings are tested against OmniPlan 4.10.2. Two environments:
+
+- **Host:** the contributor's working Mac (macOS 15.x), used for the bulk of menu-state probes and save-roundtrip diffs.
+- **VM cross-check (when needed):** a Tart VM cloned from the published image `umbridge.tail486ac0.ts.net:5051/tart/macos-15.7-l3-omni-suite:v2-tcc-granted-20260513`, scheduled via Orchard. For the 2026-05-27 verification session: VM name `oplx-verify-2026-05-27`, worker `susanbones`, internal IP `192.168.64.37`. Access pattern from the host:
+
+  ```
+  orchard create vm oplx-verify-2026-05-27 \
+    --image umbridge.tail486ac0.ts.net:5051/tart/macos-15.7-l3-omni-suite:v2-tcc-granted-20260513 \
+    --labels "hostname=susanbones" --memory 8192 --cpu 4
+  orchard ssh vm oplx-verify-2026-05-27 'zsh -l -c "..."'
+  orchard delete vm oplx-verify-2026-05-27   # when done
+  ```
+
+  **Known headless-VM limitation:** OmniPlan 4.10.2 running in orchard's default headless mode rejects/times-out AppleScript document-level commands (`count documents`, `save front document`, System Events `keystroke "s"`) with error `-1712 AppleEvent timed out`, even with `with timeout of 120 seconds`. Application-level commands like `get version` work; document-level commands hang. Save-roundtrip diff tests therefore require either (a) running on a host Mac with a normal display, (b) using `orchard vnc vm <name>` to attach a visible display, or (c) routing through `omniplan-mcp`'s JXA bridge which has its own workaround. The host environment is the practical default; document this limitation in the per-finding Methodology notes if a VM-only test is required.
+
 ## License
 
 Specification text is licensed CC-BY-4.0 (see [LICENSE](LICENSE)). See [NOTICE.md](NOTICE.md) for trademark and scope notes — OmniPlan is a trademark of The Omni Group; this spec is empirical and not affiliated with or endorsed by Omni.

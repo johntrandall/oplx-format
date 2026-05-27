@@ -137,6 +137,17 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 - [ ] Verify broader spec against OmniPlan 4.11+ when released.
 - [ ] OmniPlan 5.x format-version changes (currently `file-format-version="3"`)
 
+## Cross-environment verification status
+
+The Verified entries above were established on a **host Mac** (macOS 15.x, OmniPlan 4.10.2). The reverse-engineer-file-format playbook recommends a VM cross-check to catch environment-conditional plist keys (gotcha #17). For the 2026-05-27 verification session:
+
+- A Tart VM (`oplx-verify-2026-05-27`, image `macos-15.7-l3-omni-suite:v2-tcc-granted-20260513`) was provisioned via Orchard.
+- VM AppleScript-driven document operations (`count documents`, `save front document`, `keystroke "s"`) timed out at `-1712` in orchard's default headless mode — even with `with timeout of 120 seconds`. Application-level commands (`get version`) worked.
+- VM cross-check could not complete via AppleScript save-roundtrip. Acceptable alternatives (not exercised this session): `orchard vnc vm <name>` to attach a display, or routing through `omniplan-mcp`'s JXA bridge.
+- **Implication for the Verified entries marked "2026-05-27":** they are host-confirmed but not VM-confirmed. The wire-format claims (XML schema, element-name correspondence) are not plausibly environment-conditional — but a gotcha-#17-style "this key appears only on the host" or "this menu name only renders on the host" finding would not have been caught by this session.
+
+See `README.md` § "Verification environment" for the canonical VM access pattern.
+
 ## Methodology lessons
 
 Embedded in private research notes. The summary version:
