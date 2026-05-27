@@ -88,7 +88,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 
 - [ ] `<recalculate>` invalid values (none, assignments, BOGUS) → normalize to `duration`. Saved doc shows `duration`; cannot distinguish "normalized" from "stripped + default-fill".
 - [ ] `next-task-id` reset behavior on every save (Cycle 0011 had it preserved by coincidence in Cycle 0010)
-- [ ] OmniPlan auto-corrects `<resource id="r-1"><name/></resource>` → `<name>Project</name>`
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — OmniPlan auto-corrects `<resource id="r-1"><name/></resource>` → `<name>Project</name>` AND `<type>Group</type>` → `<type>Project</type>`. Observed in the hammock-multi-test fixture: input had `<resource id="r-1"><name/><type>Group</type>...</resource>`; post-save XML showed `<name>Project</name><type>Project</type>`. The root resource has its own dedicated `Project` type value (not in the Staff/Equipment/Material/Group enum used by user-created resources).
 - [ ] Cycle 0011's `resourceAssignmentType = adjustDuration` round-trip is inferred from t506's saved state (no changelog entry because default values produce no entry)
 
 ## Inferred (never directly tested)
@@ -112,7 +112,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 - [ ] `attachment` AppleScript class — how to ADD an attachment programmatically
 - [ ] `change mark from "name"` — is this only user attribution, or is there a marker XML element?
 - [ ] `fix violation with action "..."` — what action strings are valid?
-- [ ] `Project.title` setter — where does it persist?
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — `Project.title` setter persists to `__TOC.xml/<project>/<title>NAME</title>`. Test: `tell project of front document to set title to "TestProjectTitle-2026"` then save; post-save TOC contained `<project><title>TestProjectTitle-2026</title>...`. Does NOT write to `Actual.xml` (no scenario-level title element). The setter on `document.name` is read-only (-10006); use `project.title` instead.
 
 ### Edge cases
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — Hammock without deps: OmniPlan computes effort = **1 work week** = `hours-per-week` × 3600s = 144000s for the default `hours-per-week="40"`. Test: converted a normal task (original effort 7200) to `<type>hammock</type>` with no `<prerequisite-task>` elements, opened in OmniPlan, saved; post-save `<effort>` was 144000. Task is accepted (no rejection), `<recalculate>duration</recalculate>` is preserved. The original task's effort value is overwritten by the recalculation.
@@ -124,7 +124,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
   1. **Position:** `<user-data>` must appear at the END of the task element (after `<note>`, `<assignment>`, etc.). Earlier-in-task position causes the block to be silently stripped on save.
   2. **TOC registration required:** the key must be listed in `__TOC.xml/<project>/<task-user-data-keys>` as `<key>NAME</key><null/>`. Without registration, the value block is silently stripped on save (even with correct position).
   3. **Root task `t-1`:** cannot carry `<user-data>` — injecting there causes file-level rejection.
-- [ ] `<custom-data>` cold-write (key not in `__TOC.xml/<task-user-data-keys>`)
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — `<user-data>` cold-write (key not in `__TOC.xml/<task-user-data-keys>`): the `<user-data>` block is **silently stripped on save**. Tested with `<key>BudgetCode</key><string>BC-2026</string>` injected on a non-root task at end-of-task position with valid `<string>` value but no TOC registration; post-save user-data count was 0. TOC registration as `<key>NAME</key><null/>` pairs is mandatory (Verified silent-corruption, documented in silent-corruption.md). Note the element name is `<user-data>` (not `<custom-data>` — the Open question's wording was incorrect; both AppleScript and the wire format use `user-data`).
 - [ ] `subtract work time on date "..."` — find the working date format
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — AppleScript `lead percentage` stays **fraction** semantics (NOT integer-percent like omniJS). Tested values 0, 0.25, 0.5, 1.0, 2.0, -0.5, 25, 100 — ALL accepted verbatim by the setter, readback returns the same value (no clamping, no truncation, no rejection). Setting `lead percentage of d to 0.5` then saving produces `<lead-time is-percentage="true">0.5</lead-time>` in the wire format. The opposite convention from omniJS (which uses integer-percent and silently rejects values < 1) is canonical in the spec's surface table.
 
