@@ -117,6 +117,23 @@ OmniPlan 4.10.2 accepts ONLY `<string>` as the value type for `<user-data>` keys
 
 Hand-writing `<user-data>` inside the `<task id="t-1">` element (the implicit root) causes OmniPlan to reject the file with silent `-10000` at open. `<user-data>` is only valid on non-root tasks. Verified 2026-05-27.
 
+### `<locked-start-date>` AFTER `<recalculate>` is silently stripped on save
+
+The verified element order for tasks with date pinning is `title → effort → locked-start-date → recalculate → static-cost`. If `<locked-start-date>` appears AFTER `<recalculate>` (or after `<static-cost>`), OmniPlan opens the file successfully (`count documents = 1`) but silently strips the locked-start-date elements on first save. No error, no warning — the date pin just vanishes. Verified 2026-05-27: a fixture with `<locked-start-date>` placed after `<static-cost>` had all three test elements stripped post-save; moving them between `<effort>` and `<recalculate>` (canonical position observed in `with-baseline.oplx`) preserved all three.
+
+### Lowercase resource type (`<type>staff</type>` etc.) causes file-level rejection
+
+OmniPlan's `<resource><type>` enforces capitalization just like task `<type>`. Lowercase values `staff`, `equipment`, `material` (and presumably `group`) cause silent file-level rejection on open: `count documents` returns 0, no error dialog. Verified 2026-05-27 with a 3-resource fixture using lowercase types. Use exactly `Staff`, `Equipment`, `Material`, `Group` (capitalized).
+
+### Malformed `<effort>` causes file-level rejection
+
+`<effort>` must be a non-negative integer (seconds). Three malformed variants Verified 2026-05-27 to cause silent file-level rejection (`count documents = 0`, no error):
+- `<effort>three</effort>` (string literal)
+- `<effort>999999999999</effort>` (huge — ~31708 years)
+- `<effort>-3600</effort>` (negative)
+
+The valid form is integer seconds, ≥ 0.
+
 ### Hand-guessed styled-note `<style>` grammar is silently flattened
 
 Hand-writing `<run><style><attribute name="font-traits"><value key="bold">1</value></attribute></style><lit>TEXT</lit></run>` (and other guessed `attribute name=...` variants) does NOT produce bold/italic in the saved note. OmniPlan parses the doc cleanly, then on first save **collapses all separately-styled `<run>` siblings into a single plain `<run>`** with the lit-text concatenated and the bold/italic attributes silently dropped. No errors, no warnings, no leftover indication of the failure. Verified 2026-05-27 with a 5-run injection containing alternating bold/italic/plain runs: post-save was one `<run>` with one `<lit>plain BOLD normal ITALIC end</lit>`. The real `<style>` block grammar for font traits is still Open — needs GUI-driven content as a reference. Methodology lesson: when guessing wire-format grammar from .sdef field names or external conventions, ALWAYS check that the post-save XML preserves the structure you wrote — OmniPlan accepts then collapses without complaint.
