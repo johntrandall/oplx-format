@@ -86,14 +86,25 @@ A separate companion repo, `oplx-tools`, provides Python-based reference impleme
 Findings are tested against OmniPlan 4.10.2. Two environments:
 
 - **Host:** the contributor's working Mac (macOS 15.x), used for the bulk of menu-state probes and save-roundtrip diffs.
-- **VM cross-check (when needed):** a Tart VM cloned from the published image `umbridge.tail486ac0.ts.net:5051/tart/macos-15.7-l3-omni-suite:v2-tcc-granted-20260513`, scheduled via Orchard. For the 2026-05-27 verification session: VM name `oplx-verify-2026-05-27`, worker `susanbones`, internal IP `192.168.64.37`. Access pattern from the host:
+- **VM cross-check (when needed):** a **persistent** Tart VM named `oplx-spec-verify` lives on `susanbones`, cloned from `umbridge.tail486ac0.ts.net:5051/tart/macos-15.7-l3-omni-suite:v2-tcc-granted-20260513`. It has all 4 Omni apps installed and licensed (OmniPlan, OmniGraffle, OmniFocus, OmniOutliner) and has the additional TCC Accessibility + Automation grants for `sshd-keygen-wrapper` that the base image doesn't yet bake. Lifecycle:
 
   ```
-  orchard create vm oplx-verify-2026-05-27 \
-    --image umbridge.tail486ac0.ts.net:5051/tart/macos-15.7-l3-omni-suite:v2-tcc-granted-20260513 \
-    --labels "hostname=susanbones" --memory 8192 --cpu 4
-  orchard ssh vm oplx-verify-2026-05-27 'zsh -l -c "..."'
-  orchard delete vm oplx-verify-2026-05-27   # when done
+  tart-vm status                   # check if running
+  tart-vm start oplx-spec-verify   # resume (or initial clone — see below)
+  tart-vm stop  oplx-spec-verify   # park; preserves the manual TCC grants
+  tart-vm ssh   oplx-spec-verify   # use it
+  # DO NOT tart-vm destroy oplx-spec-verify  ← loses the manual TCC grants
+  ```
+
+  **Re-cloning from scratch (only if the VM is lost):**
+  ```
+  tart-vm start oplx-spec-verify \
+    --from umbridge.tail486ac0.ts.net:5051/tart/macos-15.7-l3-omni-suite:v2-tcc-granted-20260513 \
+    --as local-runtime
+  # Then VNC in and add /usr/libexec/sshd-keygen-wrapper to:
+  #   System Settings → Privacy & Security → Accessibility
+  #   System Settings → Privacy & Security → Automation (OmniPlan + System Events)
+  open vnc://admin:admin@$(tart-vm ip oplx-spec-verify)
   ```
 
   **Two real blockers encountered (2026-05-27) and how they were resolved:**
