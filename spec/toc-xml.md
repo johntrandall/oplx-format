@@ -176,6 +176,29 @@ Records UI state as of last save: which view is active, column widths, gantt zoo
 
 The `<scale scale-name="..." full-day-width="N">` entries set the gantt zoom levels (Automatic, Day, Hour, Minute, Month, Quarter, Week, Year). One has `<selected/>` indicating the active zoom.
 
+### `<gantt-view>` toggle children — View → Gantt menu state
+
+The `<gantt-view>` element holds the Gantt-area UI configuration. Five empty-element children represent the state of toggleable items in **View → Gantt** menu. When the toggle is ON, the element is present; when OFF, the element is absent. **Menu item is `enabled=true` in BOTH cases** — the element controls the CHECKED state of the toggle, not the ENABLED state. (Verified 2026-05-27 via single-variable AppleScript probe against OmniPlan 4.10.2.)
+
+| Menu item | XML element | Notes |
+|---|---|---|
+| Dependency Lines | `<dependency-lines/>` | Verified — controls toggle checked state |
+| Critical Paths | `<critical-path/>` | **Singular** (not `critical-paths/`). Verified by menu-toggle → save → diff |
+| Slack Lines | `<slack/>` | **Drops "lines"**. Verified by menu-toggle → save → diff |
+| Group Shading | `<group-shading/>` | Verified |
+| Constraints | `<constraints/>` | Verified — corpus (BAK + with-baseline) + isolation |
+
+**Element placement:** all five appear as direct children of `<gantt-view>`, between `<view-mode>actual</view-mode>` and the first `<scale>` entry. Order observed across saved files: `dependency-lines`, `constraints`, then the others when present.
+
+**Menu-name-to-element-name is NOT a simple pattern.** Don't assume kebab-case-of-menu-name — `Critical Paths → critical-path` (singular) and `Slack Lines → slack` (drops the noun) both break that pattern. When emitting from a generator, use exactly the names above. When extending to a future toggle, do a toggle-via-menu → save → diff test to discover the actual element name, don't guess.
+
+**For a generator:** the safe default is to OMIT all five elements (toggle defaults are OFF). Hand-generated files like `with-hammock.oplx` and `minimum-viable.oplx` open fine without them — the menu items appear enabled and unchecked. Include them only if you want a specific toggle to be ON when the user first opens the file.
+
+**Test corpus (2026-05-27):**
+- `~/dev/_funding/funding-pipeline.oplx` (OmniPlan-saved): contains none of the five
+- `~/dev/oplx-format/examples/with-baseline.oplx` (OmniPlan-saved): `<dependency-lines/>` + `<constraints/>`
+- `~/Documents/Documents - ChoChang/Gantt Timeline BAK 11.11.oplx` (OmniPlan-saved): `<dependency-lines/>` + `<constraints/>`
+
 ## File-format-version
 
 Always `"3"` in OmniPlan 4.10.x. The attribute is required on the `<omniplan>` root.

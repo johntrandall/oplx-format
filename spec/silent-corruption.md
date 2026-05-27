@@ -97,6 +97,10 @@ Hand-bumping `<next-task-id>` to a high value does NOT survive — OmniPlan reco
 
 Cycle 0015 of the research repo wrongly claimed the AppleScript `set scheduling granularity` setter was a no-op because `__TOC.xml` was unchanged. The setter actually persists to `<granularity>` in `Actual.xml`. Methodology lesson: when checking if a setter is a no-op, diff ALL bundle XML files, not just one.
 
+### Hand-injected wrong-name `<gantt-view>` toggle elements are silently stripped
+
+Hand-writing `<critical-paths/>` (plural) instead of `<critical-path/>` (singular) inside `<gantt-view>` does NOT activate the View → Gantt → Critical Paths toggle. The wrong-name element is silently dropped by OmniPlan on first save with no warning. Same pattern for any naively-guessed sibling toggle name — the menu-name-to-element-name mapping is irregular (see `toc-xml.md` § "`<gantt-view>` toggle children" for the verified 5-element table). Methodology lesson: don't extrapolate element names from menu names; verify each via menu-toggle → save → diff. Verified 2026-05-27 by injecting `<critical-paths/>` into a fixture; OmniPlan stripped it on save and emitted `<critical-path/>` only after the menu was actually toggled.
+
 ## LOW: cosmetic / metadata
 
 ### Custom-data key order is non-deterministic

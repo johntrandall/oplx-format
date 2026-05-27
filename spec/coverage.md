@@ -72,6 +72,18 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 - [x] `__changelog.xml` `<change-set>` and nested `<change>` grammar
 - [x] OmniPlan strips empty/default-shaped prototype-tasks on save
 
+### `<gantt-view>` toggle children (View → Gantt menu state)
+*Verified 2026-05-27 against OmniPlan 4.10.2 via single-variable AppleScript probe + menu-toggle → save → diff. See `toc-xml.md` § "`<gantt-view>` toggle children".*
+
+- [x] `<dependency-lines/>` empty element corresponds to View → Gantt → Dependency Lines toggle ON; absence = OFF
+- [x] `<critical-path/>` (**singular**) corresponds to View → Gantt → Critical Paths toggle ON
+- [x] `<slack/>` (**drops "lines"**) corresponds to View → Gantt → Slack Lines toggle ON
+- [x] `<group-shading/>` corresponds to View → Gantt → Group Shading toggle ON
+- [x] `<constraints/>` corresponds to View → Gantt → Constraints toggle ON
+- [x] All five toggles' menu items are `enabled=true` regardless of element presence (no element ≠ disabled menu — earlier strong claim that absence "disables the menu entirely" was tested and falsified)
+- [x] Element placement: between `<view-mode>` and the first `<scale>`, as direct children of `<gantt-view>`
+- [x] Naming pattern is NOT simple kebab-of-menu-name — see `Critical Paths → critical-path` and `Slack Lines → slack` exceptions
+
 ## Observed (correlation, not isolated proof)
 
 - [ ] `<recalculate>` invalid values (none, assignments, BOGUS) → normalize to `duration`. Saved doc shows `duration`; cannot distinguish "normalized" from "stripped + default-fill".
