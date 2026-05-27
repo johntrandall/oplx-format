@@ -116,7 +116,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 
 ### Edge cases
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — Hammock without deps: OmniPlan computes effort = **1 work week** = `hours-per-week` × 3600s = 144000s for the default `hours-per-week="40"`. Test: converted a normal task (original effort 7200) to `<type>hammock</type>` with no `<prerequisite-task>` elements, opened in OmniPlan, saved; post-save `<effort>` was 144000. Task is accepted (no rejection), `<recalculate>duration</recalculate>` is preserved. The original task's effort value is overwritten by the recalculation.
-- [ ] Hammock with multiple prereqs — which one defines the start?
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — Hammock with multiple prereqs: `start = max(predecessor end dates)` for FS dependencies (the LATEST finish wins). Test: minimal 3-task fixture with t1 (effort 3600s, no prereqs), t2 (effort 28800s, no prereqs, finishes later than t1), t3 (`<type>hammock</type>` with `<prerequisite-task idref="t1"/>` + `<prerequisite-task idref="t2"/>`, both FS default kind). omniJS readback: `t3.startDate = t2.endDate` (Jun 02 12:00Z), confirming the LATER predecessor defines the start. t3 effort stayed at 0 (no successor → no end-side constraint → degenerate hammock).
 - [x] **VERIFIED 2026-05-27** — `<numbering-style>` accepts `wbs` (Hierarchical Numbering) AND `flat` (Flat Numbering). Test: injected `<numbering-style>flat</numbering-style>` in a hand-built `.oplx` TOC, opened in OmniPlan 4.10.2, View → Task Outline submenu shows "Flat Numbering" checked, "Hierarchical Numbering" unchecked. (Reverse case: `wbs` → Hierarchical checked.) The "Show/Hide Numbering" toggle is independent — separate XML element not yet identified. The AppleScript dictionary exposes no `numbering style` enum (the XML element is wire-only). Whether other enum values exist (e.g. for the show/hide toggle) — Open.
 - [ ] `<page-adornment>` complete variable list (only `OPDocumentTitleVariableIdentifier`, `OPPrintJobTimestampVariableIdentifier` seen)
 - [ ] Note rich-text with formatting (bold/italic/color/alignment) — `<style>` block grammar
@@ -126,7 +126,7 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
   3. **Root task `t-1`:** cannot carry `<user-data>` — injecting there causes file-level rejection.
 - [ ] `<custom-data>` cold-write (key not in `__TOC.xml/<task-user-data-keys>`)
 - [ ] `subtract work time on date "..."` — find the working date format
-- [ ] AppleScript `lead percentage` boundaries (does it match omniJS integer or stay fraction with truncation?)
+- [x] **VERIFIED 2026-05-27 (VM cross-check)** — AppleScript `lead percentage` stays **fraction** semantics (NOT integer-percent like omniJS). Tested values 0, 0.25, 0.5, 1.0, 2.0, -0.5, 25, 100 — ALL accepted verbatim by the setter, readback returns the same value (no clamping, no truncation, no rejection). Setting `lead percentage of d to 0.5` then saving produces `<lead-time is-percentage="true">0.5</lead-time>` in the wire format. The opposite convention from omniJS (which uses integer-percent and silently rejects values < 1) is canonical in the spec's surface table.
 
 ### Future-version surveillance
 
