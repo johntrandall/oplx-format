@@ -116,6 +116,8 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
 ### Future-version surveillance
 
 > Status check **2026-05-27**: public OmniPlan release is still **4.10.2** (`defaults read /Applications/OmniPlan.app/Contents/Info CFBundleShortVersionString`). All four items below remain pending; re-check when 4.10.3 / 4.11 ships and the RT #3107771 fixes land in a public build.
+>
+> **Expiry rule:** re-run the `defaults read` check at every spec refresh. Remove this block (and promote any newly-Verified items) once all four bullets below resolve.
 
 - [ ] **TODO when next OmniPlan release ships** — Verify Task `parent` accessor + `move` method against the live release. Vendor confirms fix in next release per RT #3107771 (2026-05-05); update to Verified once release ships and tested.
 - [ ] **TODO when next OmniPlan release ships** — Verify Resource `parent` accessor + `move` method against the live release. Vendor confirms fix in next release per RT #3107771; update to Verified once release ships and tested.
