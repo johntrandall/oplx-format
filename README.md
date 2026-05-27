@@ -96,7 +96,13 @@ Findings are tested against OmniPlan 4.10.2. Two environments:
   orchard delete vm oplx-verify-2026-05-27   # when done
   ```
 
-  **Known headless-VM limitation:** OmniPlan 4.10.2 running in orchard's default headless mode rejects/times-out AppleScript document-level commands (`count documents`, `save front document`, System Events `keystroke "s"`) with error `-1712 AppleEvent timed out`, even with `with timeout of 120 seconds`. Application-level commands like `get version` work; document-level commands hang. Save-roundtrip diff tests therefore require either (a) running on a host Mac with a normal display, (b) using `orchard vnc vm <name>` to attach a visible display, or (c) routing through `omniplan-mcp`'s JXA bridge which has its own workaround. The host environment is the practical default; document this limitation in the per-finding Methodology notes if a VM-only test is required.
+  **Two real blockers encountered (2026-05-27) and how they were resolved:**
+
+  1. **Orchard schedules VMs headless.** Document-level AppleScript commands (`count documents`, `save front document`) hung with `-1712 AppleEvent timed out` even with `with timeout of 120 seconds`. Application-level commands (`get version`) worked. **Fix:** bypass Orchard and use the `tart-vm` wrapper directly (`tart-vm start NAME --from IMAGE --as ephemeral`). It runs with the Aqua session on (per `tart-vm-management` skill, "tart-vm has no `--gui` flag. Aqua session is on by default.").
+
+  2. **TCC Accessibility not granted for sshd-keygen-wrapper.** Even with Aqua running, all System Events / AppleEvents commands targeting OmniPlan documents timed out. Inspection of `/Library/Application Support/com.apple.TCC/TCC.db` showed `sshd-keygen-wrapper` had `kTCCServiceSystemPolicyAllFiles = 2` (Full Disk Access) but `kTCCServiceAccessibility = 0` (DENIED). The `v2-tcc-granted` image granted Full Disk Access but NOT Accessibility for SSH-driven scripts. **Fix:** VNC into the VM (`open vnc://admin:admin@<vm-ip>`) and add `/usr/libexec/sshd-keygen-wrapper` to System Settings → Privacy & Security → Accessibility. After the grant, `count documents` returned correctly and `save front document` completed cleanly.
+
+  After both blockers were resolved, the save-roundtrip tests (`<numbering-style>flat</numbering-style>`, `<user-data>` value types) ran successfully. The `<user-data>` test result OVERTURNED an earlier host-only "all 4 types Verified" claim — see the corrected entry in `spec/coverage.md`. **Methodology lesson:** if your host test relies on grepping the file after a save, also check that the save actually ran (e.g. byte-diff against the pre-open state, or look for first-save normalization markers like changed `<gantt-view>` dimensions). A silently-rejected file looks byte-identical to the input, which can falsely "verify" content that was never actually saved.
 
 ## License
 
