@@ -152,7 +152,44 @@ Filters reveal **internal property names** that aren't surfaced as XML elements:
 - `selectedDependencyChain` (string `"dependents"` or `"prerequisites"`)
 - `selectedAtTimeOfFiltering` (bool)
 
-Hand-writing new filters requires hand-encoding NSKeyedArchiver bplists — non-trivial. Generators that produce minimal docs typically omit `<filter>` blocks; OmniPlan will not auto-add the default set.
+Hand-writing new filters from scratch requires hand-encoding NSKeyedArchiver bplists — non-trivial. Generators that produce minimal docs typically omit `<filter>` blocks; OmniPlan will not auto-add the default set.
+
+#### Modifying an existing filter (Verified 2026-05-27)
+
+Hand-modifying an existing filter's predicate is feasible and round-trips cleanly. Recipe (Python 3):
+
+```python
+import base64, plistlib, re
+
+# 1. Read TOC and locate the filter
+with open("__TOC.xml") as f:
+    toc = f.read()
+m = re.search(r'<filter name="Due Soon"[^>]*>([^<]+)</filter>', toc)
+b64 = m.group(1)
+
+# 2. Decode the bplist
+plist = plistlib.loads(base64.b64decode(b64))
+
+# 3. Mutate the desired field. The constant-value index depends on
+#    the predicate's structure (compound vs simple vs function-expr) —
+#    inspect plist['$objects'] to locate it. For a simple equality
+#    predicate like "status == 1", the constant is the integer object
+#    referenced by NSConstantValueExpression.
+plist['$objects'][15] = 99   # was 1; index discovered via inspection
+
+# 4. Re-serialize as binary plist and re-encode base64
+new_b64 = base64.b64encode(
+    plistlib.dumps(plist, fmt=plistlib.FMT_BINARY)
+).decode('ascii')
+
+# 5. Substitute back and re-zip the bundle
+with open("__TOC.xml", "w") as f:
+    f.write(toc.replace(b64, new_b64))
+```
+
+OmniPlan accepts the differently-sized bplist (the Python serializer produces a slightly different byte layout than OmniPlan's) without complaint, and the modification survives a save round-trip. Sibling filters are not affected — OmniPlan reads each filter independently by `id=`.
+
+**Constraint:** the exact object index of a value depends on the predicate type. Always locate via `plistlib.loads` + dict inspection; never hard-code an index for a different predicate.
 
 ### `<leveling>`
 
