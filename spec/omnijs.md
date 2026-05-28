@@ -64,7 +64,12 @@ When all three are set, `effort` is auto-computed via PERT: `effort = (min + 4*e
 
 ### Resources
 
-- `resourceAssignmentType` (ResourceAssignmentType — **this IS the `<recalculate>` field**, despite the unobvious name; Cycle 0008's "genuine gap" claim was wrong)
+- `resourceAssignmentType` (ResourceAssignmentType — **this IS the `<recalculate>` field**, despite the unobvious name; Cycle 0008's "genuine gap" claim was wrong). Mapping Verified 2026-05-27 (VM cross-check) in both read and write directions:
+  - `ResourceAssignmentType.adjustDuration` ↔ `<recalculate>duration</recalculate>` (default)
+  - `ResourceAssignmentType.adjustEffort` ↔ `<recalculate>effort</recalculate>`
+  - `ResourceAssignmentType.adjustAssignedUnits` ↔ `<recalculate>units</recalculate>` (note: enum name is `adjustAssignedUnits`, NOT `adjustUnits`)
+
+  The omniJS object's `toString()` form is `[object ResourceAssignmentType: <enum-name>]` — there is no `.name` property; introspect via `Object.getPrototypeOf(value).constructor.name`.
 - `resourceLeveledDate` (Date or null r/o)
 - `resourceLevelingDelay` (Number r/o)
 - `assignments` (Array of Assignment r/o)
