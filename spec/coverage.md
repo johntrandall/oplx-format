@@ -114,7 +114,32 @@ What's been Verified, Observed, or remains Open as of spec version 0.1.0 (OmniPl
   3. The mutation does NOT need to preserve sibling-filter ordering or IDs — OmniPlan reads each filter independently by `id=`.
 
 ### Unexplored API
-- [x] **VERIFIED 2026-05-27 (VM cross-check)** — `attachment` cannot be added programmatically. The AppleScript `attachment` class declares `file` as `access="r"` (read-only) — no documented writable setter exists. omniJS surface has NO `Attachment` class at all (not in `OP-API.md`'s 80+ class list). `make new attachment with properties {file:...}` errors with `-1700 "Can't make {file:...} into type properties of attachment"`. Reading attachments works (`count attachments of t1` returns 0 cleanly). **The only programmatic path to attach a file is via XML emission or the GUI** — neither scripting surface supports it in 4.10.2. Likely a documented-but-incomplete API surface.
+- [x] **VERIFIED 2026-05-27 (VM cross-check) + 2026-05-28 XML-path follow-up** — `attachment` cannot be added programmatically *via the scripting surfaces* (AppleScript `attachment.file` is `access="r"` read-only; omniJS has no `Attachment` class — not in `OP-API.md`'s 80+ class list; `make new attachment with properties {file:...}` errors `-1700 "Can't make {file:...} into type properties of attachment"`). Reading attachments works (`count attachments of t1` returns 0 cleanly).
+
+  **The XML-emission path DOES work** (Verified 2026-05-28 against OmniPlan 4.10.2 build 232.5.0). The wire form lives inside `<task>` as:
+
+  ```xml
+  <attachment uri="file:///abs/path/to/file.ext">
+    <bookmarkData>BASE64_NSURL_BOOKMARK</bookmarkData>
+  </attachment>
+  ```
+
+  - `uri` attribute (required) is the standard URL — for local files use the `file://` form from `NSURL.absoluteString()`.
+  - `<bookmarkData>` child (required) is a base64-encoded macOS NSURL bookmark generated via PyObjC:
+    ```python
+    from Foundation import NSURL
+    import base64
+    url = NSURL.fileURLWithPath_(abspath)
+    bm, err = url.bookmarkDataWithOptions_includingResourceValuesForKeys_relativeToURL_error_(
+        0, None, None, None,
+    )
+    b64 = base64.b64encode(bytes(bm)).decode("ascii")
+    uri = url.absoluteString()
+    ```
+  - Element position: after `<static-cost>` (and after constraint dates), before `<prerequisite-task>` / `<assignment>` / `<note>` / `<user-data>`.
+  - **Gotcha (silent-corruption, HIGH):** an `<attachment>` *without* `<bookmarkData>` is silently ignored on load — file opens, no error dialog, but `count attachments of task` returns 0. Verified by isolation test 2026-05-28: a self-closing `<attachment uri="file:///..."/>` emitted without the bookmark child opened cleanly but produced zero attachments on readback. Documented in `silent-corruption.md` (`ATTACH-NO-BOOKMARK`).
+
+  Origin: reverse-engineered via manual GUI attach + post-process script (`~/dev/macos-spaces-multimonitor-sync-hammerspoon-business/scripts/gen-oplx-from-plane.py`, 2026-05-28) producing `plan/spacessync-from-plane.oplx` with 76 task attachments, each confirmed non-zero via `tell application "OmniPlan" to count of attachments of task ... of document 1`.
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — `change mark from "name"` is user-attribution for changelog entries (NOT a marker XML element). The string argument feeds the `user` attribute of subsequent `<change-set>` elements in `__changelog.xml`: `<change-set user="NAME" date="..." order="N">...</change-set>`. **In the MDM-managed Tart VM**, the value is dominated by the system identity `"Managed via Tart"` regardless of the `change mark from` call — verified by inspecting the changelog after multiple AppleScript-driven changes; all entries showed `user="Managed via Tart"` even after `change mark from "TestUser-Claude"`. The `change mark from` setter likely DOES work on a non-managed Mac (the saved `Modifier` field would also need to differ); needs a non-MDM probe to confirm full effect. The MDM-managed-identity collision is the same root cause as `reverse-engineer-file-format` gotcha #17.
 - [x] **VERIFIED 2026-05-27 (VM cross-check)** — `fix <violation> with action "..."` action strings enumerated for three common violation types. The valid strings are exposed via the `actions` property on each violation (`get actions of first violation of front document`). Three violation types tested:
 

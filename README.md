@@ -66,6 +66,7 @@ The `.oplx` extension covers both — OmniPlan introspects the contents, not the
 - [`examples/minimum-viable.oplx`](examples/minimum-viable.oplx) — smallest valid `.oplx` (1.1 KB zip, 3 hand-coded XML files)
 - [`examples/with-baseline.oplx`](examples/with-baseline.oplx) — multi-scenario doc with one baseline
 - [`examples/with-hammock.oplx`](examples/with-hammock.oplx) — hammock task pattern (the only way to create one — the omniJS API silently refuses)
+- [`examples/with-attachment.oplx`](examples/with-attachment.oplx) — `<attachment>` wire form (`t1` works; `t2` demonstrates the silent-ignore failure mode when `<bookmarkData>` is omitted; resolves against `examples/attachment-target.txt`)
 
 ## Tooling
 

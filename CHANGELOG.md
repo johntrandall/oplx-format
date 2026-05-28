@@ -4,6 +4,14 @@ All notable changes to this spec are documented here. See `VERSION` for the curr
 
 ## [Unreleased]
 
+### 2026-05-28
+
+- `spec/actual-xml.md` — new `<attachment>` element documented under `<task>` (wire form + position in element-order + PyObjC code path for generating `<bookmarkData>`). Verified 2026-05-28 against OmniPlan 4.10.2 build 232.5.0 via manual GUI attach + hand-emit round-trip.
+- `spec/coverage.md` — earlier 2026-05-27 row claiming "attachment cannot be added programmatically" expanded with the XML-emission path, the PyObjC bookmark recipe, and the silent-ignore gotcha. The scripting-surface claim still stands (AppleScript and omniJS remain non-functional); only the XML path works.
+- `spec/silent-corruption.md` — new HIGH-severity entry `ATTACH-NO-BOOKMARK`: `<attachment>` without `<bookmarkData>` opens cleanly but `count attachments of task` returns 0.
+- `examples/with-attachment.oplx` (+ sibling `examples/attachment-target.txt`) — 2-task fixture: `t1` has a working attachment with bookmark; `t2` has the same structure minus `<bookmarkData>` to demonstrate the silent-ignore failure mode side-by-side.
+- `README.md` — `with-attachment.oplx` added to the Examples list.
+
 ### 2026-05-07
 
 - `LICENSE` replaced with the canonical SPDX CC-BY-4.0 text so GitHub's Licensee detector recognizes the license correctly. Trademark / scope / methodology content from the previous LICENSE file migrated to a new sibling `NOTICE.md`. README License section updated accordingly.

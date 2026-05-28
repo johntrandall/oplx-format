@@ -1,0 +1,2 @@
+Sample attachment target for examples/with-attachment.oplx.
+The bookmark in t1's <attachment> resolves to this file.
