@@ -65,6 +65,10 @@ Readback shows `TaskType.task`. The only programmatic path to a hammock task is 
 
 Setting via omniJS keeps the prior value. Generators should never emit `Invalid`.
 
+### `fix violation with action "..."` invalid actions silently ignored
+
+Verified 2026-05-27. Calling `fix <violation> with action "bogus-action-name"` returns no AppleScript error but does nothing — the violation count is unchanged and no XML is modified. Always enumerate via `actions of <violation>` before calling `fix`; never hard-code action strings without checking. See applescript.md for valid-action examples per violation type.
+
 ## MEDIUM: value normalization
 
 ### Lowercase `kind="ff"` → default Finish-Start
