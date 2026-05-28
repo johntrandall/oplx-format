@@ -122,7 +122,39 @@ Plain multi-line note `"Line 1\nLine 2"`:
 </note>
 ```
 
-Each line → `<p>` containing `<run>` containing `<lit>`. Styled runs add `<style>` blocks (format details TBD — see `coverage.md`).
+Each line → `<p>` containing `<run>` containing `<lit>`.
+
+#### Styled runs
+
+Styled runs add a `<style>` block inside `<run>` before the `<lit>`. The grammar is:
+
+```xml
+<run>
+  <style>
+    <value key="KEY">VALUE</value>
+    <value key="KEY2">VALUE2</value>
+  </style>
+  <lit>styled text</lit>
+</run>
+```
+
+Verified 2026-05-27 (VM cross-check) — the canonical wire-format keys are:
+
+| Key | Value type | Verified values |
+|---|---|---|
+| `paragraph-alignment` | enum | `left` (default — stripped), `center`, `right` |
+| `font-family` | string | PostScript family name (e.g. `Helvetica`) |
+| `font-weight` | integer | `9` for bold; `5` (default normal) is stripped |
+| `font-italic` | boolean | `yes` (no = default = stripped) |
+| `font-size` | integer | Point size (e.g. `18`) |
+
+OmniPlan also accepts `<value key="font-name">PostScriptFontName</value>` as input — it normalizes on save by splitting the PostScript name into `font-family` + `font-weight` (or `font-italic` if the face is oblique). `font-name` is write-only; output always uses the split form.
+
+Invalid keys silently strip the entire `<style>` block on save: `font`, `bold`, `italic`, `font-style`, `font-color`, `foreground-color`, `text-color`, `color`, `underline`, `size`. The wire-format key for text color in 4.10.2 is **not yet identified** — all obvious candidates strip.
+
+Multiple `<value>` children inside one `<style>` are allowed and round-trip together.
+
+**No scripting surface supports styled notes** — see `applescript.md` (rich-text accessors error `-1700`) and `omnijs.md` (`task.note` is a plain `String`). XML hand-write is the only programmatic path; the GUI is the only interactive path.
 
 ### `<user-data>` (custom data) form
 
