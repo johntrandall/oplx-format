@@ -154,7 +154,7 @@ Invalid keys silently strip the entire `<style>` block on save: `font`, `bold`, 
 
 Multiple `<value>` children inside one `<style>` are allowed and round-trip together.
 
-**No scripting surface supports styled notes** — see `applescript.md` (rich-text accessors error `-1700`) and `omnijs.md` (`task.note` is a plain `String`). XML hand-write is the only programmatic path; the GUI is the only interactive path.
+**No scripting surface supports styled notes** — see `coverage.md` Verified entry under "Edge cases" (omniJS `task.note` is a plain `String`; AppleScript `word N of note of task` errors `-1700` "can't make into type specifier"). XML hand-write is the only programmatic path; the GUI is the only interactive path.
 
 ### `<user-data>` (custom data) form
 

@@ -165,7 +165,7 @@ import base64, plistlib, re
 with open("__TOC.xml") as f:
     toc = f.read()
 m = re.search(r'<filter name="Due Soon"[^>]*>([^<]+)</filter>', toc)
-b64 = m.group(1)
+b64 = m.group(1).strip()   # OmniPlan 4.10.2 emits the base64 inline (no whitespace), but strip defensively against future emitter changes
 
 # 2. Decode the bplist
 plist = plistlib.loads(base64.b64decode(b64))
@@ -182,9 +182,11 @@ new_b64 = base64.b64encode(
     plistlib.dumps(plist, fmt=plistlib.FMT_BINARY)
 ).decode('ascii')
 
-# 5. Substitute back and re-zip the bundle
+# 5. Substitute back via the matched span (NOT a global string replace —
+#    two filters with identical predicate prefixes could share substrings)
+new_toc = toc[:m.start(1)] + new_b64 + toc[m.end(1):]
 with open("__TOC.xml", "w") as f:
-    f.write(toc.replace(b64, new_b64))
+    f.write(new_toc)
 ```
 
 OmniPlan accepts the differently-sized bplist (the Python serializer produces a slightly different byte layout than OmniPlan's) without complaint, and the modification survives a save round-trip. Sibling filters are not affected — OmniPlan reads each filter independently by `id=`.
