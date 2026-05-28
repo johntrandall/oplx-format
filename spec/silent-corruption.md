@@ -45,6 +45,14 @@ Tasks not reachable from `t-1` via the `<child-task>` chain are silently removed
 
 Setting `unitsAssigned = 0` via omniJS or AppleScript REMOVES the `<assignment>` element entirely. If you intend "zero allocation", that's not representable — instead, omit the assignment, or use a small positive value.
 
+### `<attachment>` without `<bookmarkData>` is silently ignored (ATTACH-NO-BOOKMARK)
+
+```xml
+<attachment uri="file:///Users/me/Documents/spec.pdf"/>     <!-- ignored on load -->
+```
+
+For local `file://` URIs, OmniPlan requires a `<bookmarkData>` child holding a base64-encoded macOS NSURL bookmark. An `<attachment>` element without that child opens cleanly (no error dialog, no parse complaint), but `count attachments of task` returns 0 — the element is silently dropped on the in-memory model. Verified 2026-05-28 against OmniPlan 4.10.2 build 232.5.0 by isolation test: a self-closing `<attachment uri="file:///..."/>` emitted without the bookmark child produced zero attachments on AppleScript readback; the same XML structure WITH `<bookmarkData>` round-tripped cleanly. See `actual-xml.md` § `<attachment>` element for the canonical wire form and the PyObjC code path for generating bookmarks.
+
 ### omniJS `task.split(at, resumingAt)` silently fails
 
 Returns `true` (success) but the split is not persisted to XML. Possibly an in-memory-only operation in 4.10.x.

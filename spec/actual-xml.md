@@ -80,6 +80,10 @@ Only set via AppleScript `set scheduling granularity to ...` or by hand-edit; om
     <lead-time is-percentage="false">SECONDS</lead-time>
    </prerequisite-task>]
 
+  [<attachment uri="file:///abs/path">                  <!-- file or HTTP attachment; multiple allowed -->
+    <bookmarkData>BASE64_NSURL_BOOKMARK</bookmarkData>  <!-- required for file:// URIs -->
+   </attachment>]
+
   [<assignment idref="rN" [units="0.5"]/>]              <!-- self-closing default; units=N omitted when 1.0 -->
 
   [<user-data>...</user-data>]                          <!-- custom data -->
@@ -101,7 +105,8 @@ Only set via AppleScript `set scheduling granularity to ...` or by hand-edit; om
 - `<child-task>` references after the value elements (groups only)
 - `<note>` after `<static-cost>` (or after `<child-task>` for groups)
 - The 4 `*-no-*-than` constraints AFTER `<static-cost>` (not before like locked-start-date)
-- `<prerequisite-task>` siblings after constraints
+- `<attachment>` siblings after `<static-cost>`, before `<prerequisite-task>` (Verified 2026-05-28)
+- `<prerequisite-task>` siblings after constraints (and after any `<attachment>` siblings)
 - `<assignment>` siblings after prerequisites
 - `<user-data>` typically last
 
@@ -170,6 +175,40 @@ Multiple `<value>` children inside one `<style>` are allowed and round-trip toge
 Interleaved `<key>NAME</key>` followed by `<string>VALUE</string>`. **Verified 2026-05-27:** only `<string>` survives as a value type in OmniPlan 4.10.2; injecting `<number>`, `<date>`, or `<boolean>` causes file-level rejection at open time (silent `-10000`). The AppleScript `custom data` surface declares value as `type="any"` and the internal model supports more, but only `<string>` persists through the wire format in 4.10.2. Order is not predictable across saves; do not rely on alphabetical or insertion-order.
 
 The keys in the doc must also be registered in `__TOC.xml/<project>/<task-user-data-keys>` as `<key>NAME</key><null/>` pairs. **This is not optional** (Verified 2026-05-27): without TOC registration, OmniPlan silently strips the `<user-data>` block on save. Position also matters — the block must come AT THE END of the task element (after `<note>`, `<assignment>`, etc.); injected earlier in the task it is silently stripped on save. `<user-data>` is not valid on the root task `t-1` — placing it there causes file-level rejection.
+
+### `<attachment>` element
+
+Verified 2026-05-28 against OmniPlan 4.10.2 build 232.5.0 by manual GUI attach + round-trip hand-emission.
+
+```xml
+<attachment uri="file:///Users/me/Documents/spec.pdf">
+  <bookmarkData>YnBsaXN0MDDUAQIDBAUGBwhfEBhib29rbWFy...</bookmarkData>
+</attachment>
+```
+
+- Element name: **`<attachment>`** (singular). Lives directly inside `<task>`. Multiple `<attachment>` siblings allowed per task.
+- `uri` attribute (required): standard URL. For local files, the `file://` form macOS emits via `NSURL.absoluteString()` (includes trailing percent-encoding and a `/` on directories).
+- `<bookmarkData>` child (required for `file://` URIs): base64-encoded macOS NSURL bookmark data. The bookmark encodes inode + path + volume UUID so the link survives file renames. **An `<attachment>` without `<bookmarkData>` is silently ignored on load** — the document opens, the lint surface does not complain, but `count attachments of <task>` returns 0 (see `silent-corruption.md` `ATTACH-NO-BOOKMARK`).
+- Element position: after `<static-cost>` (and after any constraint dates) and before `<prerequisite-task>` / `<assignment>` / `<note>` / `<user-data>`. The full verified `<task>` order observed in the 2026-05-28 experiment was: `<title> → <type> (if not default) → <effort> (if not group) → <recalculate> → <static-cost> → <attachment>... → <prerequisite-task>... → <assignment>... → <note> → <user-data>`.
+- Scripting surfaces (as of 4.10.2): AppleScript declares `attachment.file` as `access="r"` (read-only); omniJS has no `Attachment` class. **XML emission is the only programmatic path** to add an attachment. See `coverage.md` Verified entry.
+- HTTP/HTTPS URIs: OmniPlan accepts `http://` / `https://` URIs without `<bookmarkData>` in the AppleScript / GUI surfaces, but the round-trip wire form is not yet enumerated here — verify against your installed build before relying on it.
+
+#### Generating `<bookmarkData>` (macOS, PyObjC)
+
+```python
+from Foundation import NSURL  # pip install pyobjc-framework-Cocoa
+import base64
+
+url = NSURL.fileURLWithPath_(abspath)
+bookmark, err = url.bookmarkDataWithOptions_includingResourceValuesForKeys_relativeToURL_error_(
+    0, None, None, None,
+)
+# err is None on success; bookmark is an NSData (~1.1 KB for a typical ~/Documents/ path)
+b64 = base64.b64encode(bytes(bookmark)).decode("ascii")
+uri = url.absoluteString()  # file:///Users/.../file.ext
+```
+
+The bookmark binary is an Apple-internal NSKeyedArchiver-style format. Treat as opaque base64; if you ever need to resolve one back to a path, route through `CFURLCreateByResolvingBookmarkData`. Generate fresh on emit rather than attempting to round-trip parsed bookmarks.
 
 ## `<resource>` element
 
